@@ -1,0 +1,16 @@
+action.scan_watchguard.param.WatchGuard_API_Key = <string>
+action.scan_watchguard.param.WG_account_id = <string>
+action.scan_watchguard.param.username = <string>
+action.scan_watchguard.param.password = <string>
+action.scan_watchguard.param.task_name = <string>
+action.scan_watchguard.param.task_description = <string>
+action.scan_watchguard.param.scan_scope = [0|1|2]
+action.scan_watchguard.param.specified_items_to_scan = <string>
+action.scan_watchguard.param.detect_hacking_tools = [0|1]
+action.scan_watchguard.param.detect_suspicious_files = [0|1]
+action.scan_watchguard.param.scan_compressed_files = [0|1]
+action.scan_watchguard.param.apply_exclusions_on_scan = [0|1]
+action.scan_watchguard.param.extensions_to_exclude = <string>
+action.scan_watchguard.param.files_to_exclude = <string>
+action.scan_watchguard.param.folders_to_exclude = <string>
+action.scan_watchguard.param.execution_window_expiration = <string>

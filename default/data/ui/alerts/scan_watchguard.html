@@ -1,0 +1,166 @@
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="WG_account_id">WatchGuard Account Id</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.WG_account_id" id="WG_account_id" />
+            <span class="help-block">
+              WatchGuard account id.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="WatchGuard_API_Key">WatchGuard API Key</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.WatchGuard_API_Key" id="WatchGuard_API_Key" />
+            <span class="help-block">
+              WatchGuard-API-Key.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="username">User name</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.username" id="username" />
+            <span class="help-block">
+              User name of the account.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="password">Password</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.password" id="password" />
+            <span class="help-block">
+              Password of the account.
+            </span>
+        </div>
+    </div>
+	<hr />
+    <div class="control-group">
+        <label class="control-label" for="task_name">Task Name</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.task_name" id="task_name" />
+            <span class="help-block">
+              Name of the scan task in the WatchGuard console.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="task_name">Task Description</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.task_description" id="task_description" />
+            <span class="help-block">
+              Description of the scan task in the WatchGuard console.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="scan_scope">Scan scope</label>
+
+        <div class="controls">
+            <select id="scan_scope" name="action.scan_watchguard.param.scan_scope" value="1">
+                <option value="0">Whole computer</option>
+                <option value="1">Critical areas</option>
+                <option value="2">Specified items</option>
+            </select>
+            <span class="help-block">Scope of the scan task.</span>
+        </div>
+    </div>	
+    <div class="control-group">
+        <label class="control-label" for="specified_items_to_scan">Items to scan</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.specified_items_to_scan" id="specified_items_to_scan" />
+            <span class="help-block">
+              List of specific locations or items to scan. All folders and files in the specified locations are scanned.
+			  Works only when Scan scope is "Specified items".
+			  Example: "C:\Downloads", "C:\Documents"
+            </span>
+        </div>
+    </div>
+	<div class="control-group">
+        <div class="controls">
+            <label class="checkbox" for="detect_hacking_tools">
+                <input type="checkbox" name="action.scan_watchguard.param.detect_hacking_tools" id="detect_hacking_tools" value="0"/>
+                Detect hacking tools. This detects potentially unwanted programs, as well as programs used by hackers.
+            </label>
+        </div>
+    </div>
+	<div class="control-group">
+        <div class="controls">
+            <label class="checkbox" for="detect_suspicious_files">
+                <input type="checkbox" name="action.scan_watchguard.param.detect_suspicious_files" id="detect_suspicious_files" value="1"/>
+                Detect suspicious files. In scheduled scans, the tool scans computer software but does not run it. Some types of threats have a lower chance of detection. Set this option to true to scan with heuristic algorithms and improve detection rates.
+            </label>
+        </div>
+    </div>
+	<div class="control-group">
+        <div class="controls">
+            <label class="checkbox" for="scan_compressed_files">
+                <input type="checkbox" name="action.scan_watchguard.param.scan_compressed_files" id="scan_compressed_files" value="1"/>
+                Scan compressed files. This decompresses compressed files and scans their contents.
+            </label>
+        </div>
+    </div>
+	<div class="control-group">
+        <div class="controls">
+            <label class="checkbox" for="apply_exclusions_on_scan">
+                <input type="checkbox" name="action.scan_watchguard.param.apply_exclusions_on_scan" id="apply_exclusions_on_scan" value="1"/>
+                Exclude items from the scan, such as specific files, files with a specific extension, or a specific directory.
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="extensions_to_exclude">Exclude extensions</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.extensions_to_exclude" id="extensions_to_exclude" />
+            <span class="help-block">
+              List of file extensions to exclude from the scan.
+			  Works only when apply_exclusions_on_scan is true.
+			  Example: "exe", "pdf"
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="files_to_exclude">Exclude files</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.files_to_exclude" id="files_to_exclude" />
+            <span class="help-block">
+              List of file names (with their extensions) to exclude from the scan.
+			  Works only when apply_exclusions_on_scan is true.
+			  Example: "Chrome.exe", "Explorer.exe"
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="folders_to_exclude">Exclude folders</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.folders_to_exclude" id="folders_to_exclude" />
+            <span class="help-block">
+              List of folders to exclude from the scan. You must include the full path.
+			  Works only when apply_exclusions_on_scan is true.
+			  Example: "D:/shared_drive/documents"
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="execution_window_expiration">Task expiration</label>
+
+        <div class="controls">
+            <input type="text" name="action.scan_watchguard.param.execution_window_expiration" id="execution_window_expiration" value ="7:00:00:00" />
+            <span class="help-block">
+              Time period in which the scan must run before it times out. The default is 7 days.
+			  Example: 8.07:06:05 specifies 8 days, 7 hours, 6 minutes, and 5 seconds.
+            </span>
+        </div>
+    </div>
+</form>
