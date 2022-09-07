@@ -13,14 +13,14 @@ import base64
 
 IN_SPLUNK = False
 
-panda_cloud = "api.deu.cloud.watchguard.com"
+watchguard_cloud = "api.deu.cloud.watchguard.com"
 PATH = os.environ['SPLUNK_HOME'] + "/etc/apps/scan_watchguard"
 access_token_file = PATH + "/tmp/.access_token.json"
 MAX_TIME_SCAN = 3600
 
 settings = {
-    "api_token_path": "https://" + panda_cloud + "/oauth/token",
-    "fmw_path": "https://" + panda_cloud + "/rest/aether-endpoint-security/aether-mgmt",
+    "api_token_path": "https://" + watchguard_cloud + "/oauth/token",
+    "fmw_path": "https://" + watchguard_cloud + "/rest/aether-endpoint-security/aether-mgmt",
     "api_path": "/api/v1/accounts",
     "WG_access_token": ""
 }
