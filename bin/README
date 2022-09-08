@@ -1,1 +1,9 @@
-This is where you put any scripts you want to add to this app.
+The splunk result set needs to have this fields:
+        c_ip: IP address,
+        cs_host: the host of the URL that generates the alert
+
+And you must fill minimal the first 4 parameters in the alert dialog:
+        WG_account_id
+        WatchGuard_API_Key
+        username
+        password
