@@ -13,14 +13,14 @@ import base64
 
 IN_SPLUNK = False
 
-watchguard_cloud = "api.deu.cloud.watchguard.com"
+panda_cloud = "api.deu.cloud.watchguard.com"
 PATH = os.environ['SPLUNK_HOME'] + "/etc/apps/scan_watchguard"
 access_token_file = PATH + "/tmp/.access_token.json"
 MAX_TIME_SCAN = 3600
 
 settings = {
-    "api_token_path": "https://" + watchguard_cloud + "/oauth/token",
-    "fmw_path": "https://" + watchguard_cloud + "/rest/aether-endpoint-security/aether-mgmt",
+    "api_token_path": "https://" + panda_cloud + "/oauth/token",
+    "fmw_path": "https://" + panda_cloud + "/rest/aether-endpoint-security/aether-mgmt",
     "api_path": "/api/v1/accounts",
     "WG_access_token": ""
 }
@@ -28,11 +28,11 @@ settings = {
 
 def setup_logger(level):
     global logger
-    logger = logging.getLogger("scan_watchguard")
+    logger = logging.getLogger("scan_watchguard_alert")
     logger.propagate = False
     logger.setLevel(level)
     file_handler = logging.handlers.RotatingFileHandler(
-        os.environ['SPLUNK_HOME'] + '/var/log/splunk/scan_watchguard.log',
+        os.environ['SPLUNK_HOME'] + '/var/log/splunk/scan_watchguard_alert.log',
         maxBytes = 250000000,
         backupCount = 5)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -62,24 +62,24 @@ def parse_args():
         'WatchGuard_API_Key': '',
         'username': '',
         'password': '',
-        'task_name': 'taskname'
-        'task_description': 'taskdescrip',
+        'task_name': 'test task',
+        'task_description': 'test task description',
         'scan_scope': '0',
-        'specified_items_to_scan": '',
+        'specified_items_to_scan': '',
         'detect_hacking_tools': '0',
         'scan_compressed_files': '1',
         'detect_suspicious_files': '1',
         'apply_exclusions_on_scan': '0',
-        'extensions_to_exclude": '',
-        'files_to_exclude": '',
-        'folders_to_exclude": '',
+        'extensions_to_exclude': '',
+        'files_to_exclude': '',
+        'folders_to_exclude': '',
         'execution_window_expiration': '7:00:00:00'
     }
     event_result = {
-        'c_ip': '1.1.1.1',
-        'cs_host': 'atacker.com'
+        'c_ip': '198.18.0.0',
+        'cs_host': 'example.com'
     }
-    log_message(config)
+    #log_message(config)
 
 
 
@@ -105,7 +105,6 @@ def request_token():
     }
     try:
         response = requests.post(url, headers=headers, data=payload)
-        log_message(response)
         token_data = response.json()
         present = datetime.now()
         incremento = token_data['expires_in']
@@ -148,14 +147,16 @@ def resolve_name():
 
 
 def search_computer():
+    global task_name
     global device_id
     global search
+    
     token_type = token_data['token_type']
     access_token = token_data['access_token']
     search = resolve_name()
+    task_name = config.get('task_name') + ": " + event_result.get('cs_host') + " " + search
     url = settings['fmw_path'] + settings['api_path'] + "/" + config['WG_account_id'] + "/devices?$search=" + search
     payload={}
-    log_message(config)
     headers = {
         'Watchguard-API-key': config["WatchGuard_API_Key"],
         'Authorization': token_type + " " + access_token
@@ -163,8 +164,12 @@ def search_computer():
     try:
         response = requests.request("GET", url, headers=headers, data=payload)
         response_json = response.json()
-        device_id = response_json['data'][0]['device_id']
+        device_id = response_json['data'][0]['device_id'] # one by one
         return True
+    except IndexError:
+        return False
+    except KeyError:
+        return False
     except requests.exceptions.RequestException as e:
         raise SystemExit(e)
 
@@ -179,31 +184,24 @@ def computer_locked():
     return False
 
 
-def computer_lock():
-    pass;
+def computer_lock(msg):
+    filename = PATH + "/tmp/" + search + ".json"
+    with open(filename, "w") as f:
+        f.write(msg)
+        f.close()
+
 
 def scan_computer():
-    global scan_prefix
-    global scan_description
-    global ip_addr
-        
-    scan_prefix = config.get('task_name') + ": " + event_result.get('cs_host')
-    scan_description = config.get('task_description')
-
-    log_message(scan_prefix + " " + search)
+    log_message(task_name)
     if computer_locked():
         log_message("Recently scanned, skipping")
         return
-        
-    token_type = token_data['token_type']
-    access_token = token_data['access_token']
     url = settings['fmw_path'] + settings['api_path'] + "/" + config['WG_account_id'] + "/immediatescan?device_ids=" + device_id
     time_text = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     payload = json.dumps({
         "device_ids": [ device_id ],
-        "task_name": time_text + " " + scan_prefix + " " + search,
-        "task_description": scan_description,
+        "task_name": time_text + " " + task_name,
+        "task_description": config.get('task_description'),
         "scan_scope": config.get('scan_scope'),
         "specified_items_to_scan": config.get('specified_items_to_scan'),
         "detect_hacking_tools": config.get('detect_hacking_tools'),
@@ -217,23 +215,18 @@ def scan_computer():
     })
     headers = {
         'Watchguard-API-key': config["WatchGuard_API_Key"],
-        'Authorization': token_type + " " + access_token,
+        'Authorization': token_data['token_type'] + " " + token_data['access_token'],
         "Content-Type": "application/json"
     }
-    log_message(url)
-    log_message(headers)
-    log_message(payload)
     response = requests.request("POST", url, headers=headers, data=payload)
     log_message(response.text)
-    with open(PATH + "/tmp/" + search + ".json", "w") as f:
-        f.write(response.text)
-        f.close()
-
+    computer_lock(response.text)
 
 
 
 
 def main():
+    global IN_SPLUNK
     if len(sys.argv) > 1 and sys.argv[1] == "--execute":
         IN_SPLUNK = True
         parse_stdin()
